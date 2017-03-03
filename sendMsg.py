@@ -21,7 +21,7 @@ def sendMsg(content = "", touser = "@all"):
         "touser" : touser,
         "toparty": "@all",
         "totag"  : "@all",
-        "agentid": "5",   # str or int is OK
+        "agentid": "0",   # str or int is OK
         "msgtype": "text",
         "text": {
             "content": content or "test message"

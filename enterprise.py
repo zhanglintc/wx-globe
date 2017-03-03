@@ -64,7 +64,7 @@ class updateSend(threading.Thread):
         time_e = time.time()
 
         elapse = int(time_e - time_s)
-        sendContent = "Mmrz updated at:\n{0}\nUsing: {1}s".format(time.ctime(), elapse)
+        sendContent = "Mmrz updated at:\n{0}\nusing {1}s".format(time.ctime(), elapse)
         sendMsg.sendMsg(
             content = sendContent,
             touser = self.fromuser_name,
@@ -256,7 +256,8 @@ def application(environ, start_response):
                 return message
 
             if event_key == "V1001_PULL_LATEST":
-                updateSend(fromuser_name).start()
+                ups = updateSend(fromuser_name)
+                ups.start()
 
                 return "Updating Mmrz server..."
 
