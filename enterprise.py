@@ -97,6 +97,40 @@ def setMenu():
 
     print requests.post("https://qyapi.weixin.qq.com/cgi-bin/menu/create?access_token={0}&agentid=0".format(access_token), data = params).text
 
+    Mmrz_Menu = {
+        "button":[
+            {    
+                "name":"版本管理",
+                "key":"V1001_VERSIOM",
+                "sub_button":[
+                    {
+                        "type":"click",
+                        "name":"当前版本",
+                        "key":"V1001_CURRENT"
+                    },
+                    {
+                        "type":"click",
+                        "name":"拉取新版",
+                        "key":"V1001_PULL_LATEST"
+                    },
+                ]
+            },
+            {    
+                "name":"服务管理",
+                "key":"V1002_SERVER",
+                "sub_button":[
+                    {
+                        "type":"click",
+                        "name":"重启服务",
+                        "key":"V1002_RESTART"
+                    },
+                ]
+            }
+        ]
+    }
+    Mmrz_Menu = json.dumps(Mmrz_Menu, ensure_ascii = False)
+    print requests.post("https://qyapi.weixin.qq.com/cgi-bin/menu/create?access_token={0}&agentid=5".format(access_token), data = Mmrz_Menu).text
+
 def getRequestBody(environ):
     # the environment variable CONTENT_LENGTH may be empty or missing
     try:
