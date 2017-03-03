@@ -9,7 +9,7 @@ from tools.getWeather import getWeather
 
 import xml.etree.cElementTree as ET
 
-import os, time
+import os, re, time
 import urllib, urllib2
 import threading
 import datetime
@@ -218,11 +218,21 @@ def application(environ, start_response):
             if event_key == "V1001_CURRENT":
                 os.system("cd /home/lane/Mmrz-Sync/server && git log -n 1 > mmrz-log.tmp")
                 fr = open("/home/lane/Mmrz-Sync/server/mmrz-log.tmp", "rb")
-                ver_info = fr.read()
+                content = fr.read()
                 fr.close()
                 os.system("cd /home/lane/Mmrz-Sync/server && rm mmrz-log.tmp")
 
-                ret, message = wx.EncryptMsg(text_T.format(ver_info), d["nonce"][0])
+                commit = re.search("commit (\w{10})", content)
+                author = re.search("Author: (\w*) \<", content)
+                lginfo = re.search("^\s*(\w*)", content)
+
+                commit = commit.group(1) if commit else ""
+                author = author.group(1) if author else ""
+                lginfo = lginfo.group(1) if lginfo else ""
+
+                ret_info = "commit: {0}\nauthor: {1}\nlog: {2}".format(commit, author, lginfo)
+
+                ret, message = wx.EncryptMsg(text_T.format(ret_info), d["nonce"][0])
 
                 return message
 
