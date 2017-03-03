@@ -9,6 +9,7 @@ from tools.getWeather import getWeather
 
 import xml.etree.cElementTree as ET
 
+import os, time
 import urllib, urllib2
 import threading
 import datetime
@@ -222,6 +223,12 @@ def application(environ, start_response):
                 os.system("cd /home/lane/Mmrz-Sync/server && rm mmrz-log.tmp")
 
                 ret, message = wx.EncryptMsg(text_T.format(ver_info), d["nonce"][0])
+
+                return message
+
+            if event_key = "V1002_RESTART":
+                os.system("cd home/lane/Mmrz-Sync/server && python restart.py &")
+                ret, message = wx.EncryptMsg(text_T.format("Restart at:\n"time.ctime()), d["nonce"][0])
 
                 return message
 
