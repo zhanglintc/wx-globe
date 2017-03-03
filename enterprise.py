@@ -210,6 +210,21 @@ def application(environ, start_response):
         ret, message = wx.EncryptMsg(text_T.format("尚不支持..."), d["nonce"][0])
         return message
 
+    if agent_ID == "5":
+        if msg_type == "event":
+            event_key = xml_tree.find("EventKey").text
+
+            if event_key == "V1001_CURRENT":
+                os.system("cd /home/lane/Mmrz-Sync/server && git log -n 1 > mmrz-log.tmp")
+                fr = open("/home/lane/Mmrz-Sync/server/mmrz-log.tmp", "rb")
+                ver_info = fr.read()
+                fr.close()
+                os.system("cd /home/lane/Mmrz-Sync/server && rm mmrz-log.tmp")
+
+                ret, message = wx.EncryptMsg(text_T.format(ver_info), d["nonce"][0])
+
+                return message
+
     # return a null string
     return ""
 
