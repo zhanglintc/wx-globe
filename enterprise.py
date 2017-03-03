@@ -226,9 +226,9 @@ def application(environ, start_response):
 
                 return message
 
-            if event_key = "V1002_RESTART":
-                os.system("cd home/lane/Mmrz-Sync/server && python restart.py &")
-                ret, message = wx.EncryptMsg(text_T.format("Restart at:\n"time.ctime()), d["nonce"][0])
+            if event_key == "V1002_RESTART":
+                os.system("cd /home/lane/Mmrz-Sync/server && python restart.py &")
+                ret, message = wx.EncryptMsg(text_T.format("Mmrz server restart at:\n" + time.ctime()), d["nonce"][0])
 
                 return message
 
