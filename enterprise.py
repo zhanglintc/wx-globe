@@ -224,13 +224,15 @@ def application(environ, start_response):
 
                 commit = re.search("commit (\w{10})", content)
                 author = re.search("Author: (\w*) \<", content)
-                lginfo = re.search("^\s*(\w*)", content)
+                dttime = re.search("Date: +(.*) +", content)
+                lginfo = re.search("^ +(.+)", content)
 
-                commit = commit.group(1) if commit else ""
-                author = author.group(1) if author else ""
-                lginfo = lginfo.group(1) if lginfo else ""
+                commit = commit.group(1) if commit else "none"
+                author = author.group(1) if author else "none"
+                dttime = dttime.group(1) if dttime else "none"
+                lginfo = lginfo.group(1) if lginfo else "none"
 
-                ret_info = "commit: {0}\nauthor: {1}\nlog: {2}".format(commit, author, lginfo)
+                ret_info = "Current Version\nhash: {0}\nauthor: {1}\ntime: {2}\nlog: {3}".format(commit, author, dttime, lginfo)
 
                 ret, message = wx.EncryptMsg(text_T.format(ret_info), d["nonce"][0])
 
