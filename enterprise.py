@@ -226,11 +226,20 @@ def application(environ, start_response):
 
                 return message
 
+            if event_key == "V1001_PULL_LATEST":
+                os.system("cd /home/lane/Mmrz-Sync/server && git pull")
+                ret, message = wx.EncryptMsg(text_T.format("Mmrz updated at:\n" + time.ctime()), d["nonce"][0])
+
+                return message
+
             if event_key == "V1002_RESTART":
                 os.system("cd /home/lane/Mmrz-Sync/server && python restart.py &")
                 ret, message = wx.EncryptMsg(text_T.format("Mmrz server restart at:\n" + time.ctime()), d["nonce"][0])
 
                 return message
+
+        ret, message = wx.EncryptMsg(text_T.format("尚不支持..."), d["nonce"][0])
+        return message
 
     # return a null string
     return ""
