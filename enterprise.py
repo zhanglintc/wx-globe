@@ -53,6 +53,23 @@ class AsyncSend(threading.Thread):
             touser = self.fromuser_name,
         )
 
+class updateSend(threading.Thread):
+    def __init__(self, fromuser_name):
+        threading.Thread.__init__(self)
+        self.fromuser_name = fromuser_name
+
+    def run(self):
+        time_s = time.time()
+        os.system("cd /home/lane/Mmrz-Sync/server && git pull")
+        time_e = time.time()
+
+        elapse = int(time_s - time_e)
+        sendContent = "Mmrz updated at:\n{0}\nafter{1}s".format(time.ctime(), elapse)
+        sendMsg.sendMsg(
+            content = sendContent,
+            touser = self.fromuser_name,
+        )
+
 def setMenu():
     secret = "3AhT8A1akqYHKVuLCtrcx3OvZPFHbMO03vvBaGu4xyciG8Lj6z1OGs8Zp-81ZtnE"
     url = "https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid={0}&corpsecret={1}".format(sAppId, secret)
@@ -239,10 +256,9 @@ def application(environ, start_response):
                 return message
 
             if event_key == "V1001_PULL_LATEST":
-                os.system("cd /home/lane/Mmrz-Sync/server && git pull")
-                ret, message = wx.EncryptMsg(text_T.format("Mmrz updated at:\n" + time.ctime()), d["nonce"][0])
+                updateSend(fromuser_name).start()
 
-                return message
+                return "Updating Mmrz server..."
 
             if event_key == "V1002_RESTART":
                 os.system("cd /home/lane/Mmrz-Sync/server && python restart.py &")
