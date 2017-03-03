@@ -63,8 +63,8 @@ class updateSend(threading.Thread):
         os.system("cd /home/lane/Mmrz-Sync/server && git pull")
         time_e = time.time()
 
-        elapse = int(time_s - time_e)
-        sendContent = "Mmrz updated at:\n{0}\nafter{1}s".format(time.ctime(), elapse)
+        elapse = int(time_e - time_s)
+        sendContent = "Mmrz updated at:\n{0}\nUsing: {1}s".format(time.ctime(), elapse)
         sendMsg.sendMsg(
             content = sendContent,
             touser = self.fromuser_name,
