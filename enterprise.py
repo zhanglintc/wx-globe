@@ -259,7 +259,8 @@ def application(environ, start_response):
                 ups = updateSend(fromuser_name)
                 ups.start()
 
-                return "Updating Mmrz server..."
+                ret, message = wx.EncryptMsg(text_T.format("Updating Mmrz server..."), d["nonce"][0])
+                return message
 
             if event_key == "V1002_RESTART":
                 os.system("cd /home/lane/Mmrz-Sync/server && python restart.py &")
