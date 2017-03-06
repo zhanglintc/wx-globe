@@ -263,6 +263,10 @@ def application(environ, start_response):
                 return message
 
             if event_key == "V1001_PULL_LATEST":
+                if fromuser_name != "zhanglintc":
+                    ret, message = wx.EncryptMsg(text_T.format("You are not allowed to do this"), d["nonce"][0])
+                    return message
+
                 ups = updateSend(fromuser_name)
                 ups.start()
 
@@ -270,6 +274,10 @@ def application(environ, start_response):
                 return message
 
             if event_key == "V1002_RESTART":
+                if fromuser_name != "zhanglintc":
+                    ret, message = wx.EncryptMsg(text_T.format("You are not allowed to do this"), d["nonce"][0])
+                    return message
+
                 os.system("cd /home/lane/Mmrz-Sync/server && python restart.py &")
                 ret, message = wx.EncryptMsg(text_T.format("Server has restart at:\n" + time.ctime()), d["nonce"][0])
 
@@ -281,8 +289,9 @@ def application(environ, start_response):
 
             return message
 
-        ret, message = wx.EncryptMsg(text_T.format("尚不支持..."), d["nonce"][0])
-        return message
+        # ret, message = wx.EncryptMsg(text_T.format("尚不支持..."), d["nonce"][0])
+        # return message
+        return ""
 
     # return a null string
     return ""
