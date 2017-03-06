@@ -78,6 +78,7 @@ def tuling(text):
     return content["text"]
 
 def simsimi(text):
+    text = urllib.quote(text)
     url = "http://simsimi.com/getRealtimeReq?uuid=lsUq8qBErrxTthxXH5rqbcnMLEyvkPu9uI3dDsC9lW9&lc=ch&ft=1&reqText={0}".format(text)
     content = urllib2.urlopen(url)
     content = json.loads(content.read())
