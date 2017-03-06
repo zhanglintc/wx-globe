@@ -225,7 +225,7 @@ def application(environ, start_response):
 
         else:
             content_text  = xml_tree.find("Content").text
-            ret, message = wx.EncryptMsg(text_T.format(simsimi(content_text)), d["nonce"][0])
+            ret, message = wx.EncryptMsg(text_T.format(tuling(content_text)), d["nonce"][0])
             return message
 
     if agent_ID == "3":
