@@ -78,12 +78,12 @@ def tuling(text):
     return content["text"]
 
 def simsimi(text):
-    text = urllib.quote(text)
+    text = urllib.quote(text.encode("utf-8"))
     url = "http://simsimi.com/getRealtimeReq?uuid=lsUq8qBErrxTthxXH5rqbcnMLEyvkPu9uI3dDsC9lW9&lc=ch&ft=1&reqText={0}".format(text)
     content = urllib2.urlopen(url)
     content = json.loads(content.read())
 
-    return content.get("respSentence", "尚不支持...")
+    return content.get("respSentence", "尚不支持...").encode("utf-8")
 
 def setMenu():
     secret = "3AhT8A1akqYHKVuLCtrcx3OvZPFHbMO03vvBaGu4xyciG8Lj6z1OGs8Zp-81ZtnE"
