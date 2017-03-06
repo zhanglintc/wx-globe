@@ -77,6 +77,13 @@ def tuling(text):
 
     return content["text"]
 
+def simsimi(text):
+    url = "http://simsimi.com/getRealtimeReq?uuid=lsUq8qBErrxTthxXH5rqbcnMLEyvkPu9uI3dDsC9lW9&lc=ch&ft=1&reqText={0}".format(text)
+    content = urllib2.urlopen(url)
+    content = json.loads(content.read())
+
+    return content.get("respSentence", "尚不支持...")
+
 def setMenu():
     secret = "3AhT8A1akqYHKVuLCtrcx3OvZPFHbMO03vvBaGu4xyciG8Lj6z1OGs8Zp-81ZtnE"
     url = "https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid={0}&corpsecret={1}".format(sAppId, secret)
@@ -216,7 +223,8 @@ def application(environ, start_response):
                 return ""
 
         else:
-            ret, message = wx.EncryptMsg(text_T.format("尚不支持..."), d["nonce"][0])
+            content_text  = xml_tree.find("Content").text
+            ret, message = wx.EncryptMsg(text_T.format(simsimi(content_text)), d["nonce"][0])
             return message
 
     if agent_ID == "3":
