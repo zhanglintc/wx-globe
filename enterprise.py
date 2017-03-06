@@ -63,8 +63,8 @@ class updateSend(threading.Thread):
         os.system("cd /home/lane/Mmrz-Sync/server && git pull")
         time_e = time.time()
 
-        elapse = int(time_e - time_s)
-        sendContent = "Mmrz updated at:\n{0}\nusing {1}s".format(time.ctime(), elapse)
+        elapse = (time_e - time_s)
+        sendContent = "Mmrz has updated at:\n{0}\nusing {1}s".format(time.ctime(), elapse)
         sendMsg.sendMsg(
             content = sendContent,
             touser = self.fromuser_name,
@@ -249,7 +249,7 @@ def application(environ, start_response):
                 dttime = dttime.group(1) if dttime else "none"
                 lginfo = lginfo.group(1) if lginfo else "none"
 
-                ret_info = "{2}\n\nAuthor:  {1}\nHash:  {0}\nLog:  {3}".format(commit, author, dttime, lginfo)
+                ret_info = "Remote Version Info\nModified at:\n{2}\nAuthor:  {1}\nHash:  {0}\nLog:  {3}".format(commit, author, dttime, lginfo)
 
                 ret, message = wx.EncryptMsg(text_T.format(ret_info), d["nonce"][0])
 
@@ -259,12 +259,12 @@ def application(environ, start_response):
                 ups = updateSend(fromuser_name)
                 ups.start()
 
-                ret, message = wx.EncryptMsg(text_T.format("Updating Mmrz server..."), d["nonce"][0])
+                ret, message = wx.EncryptMsg(text_T.format("Updating Mmrz, please wait..."), d["nonce"][0])
                 return message
 
             if event_key == "V1002_RESTART":
                 os.system("cd /home/lane/Mmrz-Sync/server && python restart.py &")
-                ret, message = wx.EncryptMsg(text_T.format("Mmrz server restart at:\n" + time.ctime()), d["nonce"][0])
+                ret, message = wx.EncryptMsg(text_T.format("Server has restart at:\n" + time.ctime()), d["nonce"][0])
 
                 return message
 
