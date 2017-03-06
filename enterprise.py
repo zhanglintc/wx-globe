@@ -70,6 +70,13 @@ class updateSend(threading.Thread):
             touser = self.fromuser_name,
         )
 
+def tuling(text):
+    url = "http://www.tuling123.com/openapi/api?key=77aa5b955fcab122b096f2c2dd8434c8&info={0}".format(text)
+    content = urllib2.urlopen(url)
+    content = json.loads(content.read())
+
+    return content["text"]
+
 def setMenu():
     secret = "3AhT8A1akqYHKVuLCtrcx3OvZPFHbMO03vvBaGu4xyciG8Lj6z1OGs8Zp-81ZtnE"
     url = "https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid={0}&corpsecret={1}".format(sAppId, secret)
@@ -267,6 +274,12 @@ def application(environ, start_response):
                 ret, message = wx.EncryptMsg(text_T.format("Server has restart at:\n" + time.ctime()), d["nonce"][0])
 
                 return message
+
+        if msg_type == "text":
+            content_text  = xml_tree.find("Content").text
+            ret, message = wx.EncryptMsg(text_T.format(tuling(content_text)), d["nonce"][0])
+
+            return message
 
         ret, message = wx.EncryptMsg(text_T.format("尚不支持..."), d["nonce"][0])
         return message
