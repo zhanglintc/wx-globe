@@ -85,6 +85,9 @@ def simsimi(text):
 
     return content.get("respSentence", "尚不支持...").encode("utf-8")
 
+def restart_Mmrz():
+    os.system("cd /home/lane/Mmrz-Sync/server && python restart.py &")
+
 def setMenu():
     secret = "3AhT8A1akqYHKVuLCtrcx3OvZPFHbMO03vvBaGu4xyciG8Lj6z1OGs8Zp-81ZtnE"
     url = "https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid={0}&corpsecret={1}".format(sAppId, secret)
@@ -194,6 +197,9 @@ def application(environ, start_response):
     wx = WXBizMsgCrypt(sToken, sEncodingAESKey, sAppId)
     d = parse_qs(environ['QUERY_STRING'])
 
+    # always restart Mmrz at start
+    restart_Mmrz()
+
     # set up weixin callback mode
     if "echostr" in environ['QUERY_STRING']:
         return verifyCallbackMode(environ)
@@ -287,7 +293,7 @@ def application(environ, start_response):
                     ret, message = wx.EncryptMsg(text_T.format("You are not allowed to do this"), d["nonce"][0])
                     return message
 
-                os.system("cd /home/lane/Mmrz-Sync/server && python restart.py &")
+                restart_Mmrz()
                 ret, message = wx.EncryptMsg(text_T.format("Server has restart at:\n" + time.ctime()), d["nonce"][0])
 
                 return message
