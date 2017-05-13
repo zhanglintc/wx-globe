@@ -301,7 +301,7 @@ def application(environ, start_response):
             if event_key == "V1002_COPY_DB":
                 os.system("cp /home/yanbin/wx-zncx_server/DBDATA/zncx.db /home/lane/ftp")
 
-                ret, message = wx.EncryptMsg(text_T.format('zncx.db has copied to "ftp:\\\\zhanglintc.work"'), d["nonce"][0])
+                ret, message = wx.EncryptMsg(text_T.format('zncx.db has copied to "ftp://zhanglintc.work"'), d["nonce"][0])
 
                 return message
 
