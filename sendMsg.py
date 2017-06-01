@@ -9,6 +9,7 @@ from updateAccessToken import updateAccessToken
 
 tokenFile = "AccessToken"
 
+# Refer to: http://qydev.weixin.qq.com/wiki/index.php?title=消息类型及数据格式
 def sendMsg(content = "", touser = "@all"):
     try:
         fr = open(tokenFile, "rb")

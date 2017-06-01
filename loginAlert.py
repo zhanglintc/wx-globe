@@ -15,5 +15,5 @@ msg += "Login Alert\n"
 msg += "User: {0}\n".format(whoami)
 msg += "Time: {0}\n".format(date)
 
-sendMsg.sendMsg(content=msg, touser="@all")
+sendMsg.sendMsg(content=msg, touser="zhanglintc|smile")
 
