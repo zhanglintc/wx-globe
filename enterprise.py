@@ -217,6 +217,12 @@ def application(environ, start_response):
     # event         = xml_tree.find("Event").text
     # event_key     = xml_tree.find("EventKey").text
 
+    if environ["PATH_INFO"] == "/send":
+        d = parse_qs(environ['QUERY_STRING'])
+        text = d.get('text', "default message")
+
+        sendMsg.sendMsg(content=text, touser="zhanglintc")
+
     if agent_ID == "0":
         if msg_type == "event":
             event_key = xml_tree.find("EventKey").text
