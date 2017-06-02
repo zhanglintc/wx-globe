@@ -194,6 +194,17 @@ def application(environ, start_response):
     # response content
     start_response('200 OK', [('Content-Type', 'text/html')])
 
+    if environ["REQUEST_METHOD"] == "GET":
+        if environ["PATH_INFO"] == "/send":
+            d = parse_qs(environ['QUERY_STRING'])
+            text = d.get('text', ["the default message"])[0]
+
+            sendMsg.sendMsg(content=text, touser="zhanglintc")
+
+            return "/send function entered"
+
+        return "dafault page"
+
     wx = WXBizMsgCrypt(sToken, sEncodingAESKey, sAppId)
     d = parse_qs(environ['QUERY_STRING'])
 
@@ -216,12 +227,6 @@ def application(environ, start_response):
     # content_text  = xml_tree.find("Content").text
     # event         = xml_tree.find("Event").text
     # event_key     = xml_tree.find("EventKey").text
-
-    if environ["PATH_INFO"] == "/send":
-        d = parse_qs(environ['QUERY_STRING'])
-        text = d.get('text', "default message")
-
-        sendMsg.sendMsg(content=text, touser="zhanglintc")
 
     if agent_ID == "0":
         if msg_type == "event":
