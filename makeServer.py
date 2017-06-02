@@ -13,6 +13,9 @@ from enterprise import application
 
 from updateAccessToken import updateAccessToken
 
+def restart_Mmrz():
+    os.system("cd /home/lane/Mmrz-Sync/server && python restart.py &")
+
 class AutoUpdateAccessToken(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
@@ -26,6 +29,9 @@ class AutoUpdateAccessToken(threading.Thread):
 auat = AutoUpdateAccessToken()
 auat.setDaemon(True)
 auat.start()
+
+# always restart Mmrz at start
+restart_Mmrz()
 
 # 创建一个服务器，IP地址为空，端口是8000，处理函数是application:
 port  = 8000
