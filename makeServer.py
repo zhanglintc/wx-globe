@@ -9,12 +9,9 @@ import time, os
 # 从wsgiref模块导入:
 from wsgiref.simple_server import make_server
 # 导入我们自己编写的application函数:
-from enterprise import application
+from enterprise import application, restart_Mmrz
 
 from updateAccessToken import updateAccessToken
-
-def restart_Mmrz():
-    os.system("cd /home/lane/Mmrz-Sync/server && python restart.py &")
 
 class AutoUpdateAccessToken(threading.Thread):
     def __init__(self):
@@ -25,19 +22,24 @@ class AutoUpdateAccessToken(threading.Thread):
             updateAccessToken()
             time.sleep(7000)
 
-# auto update AccessToken every 7000s
-auat = AutoUpdateAccessToken()
-auat.setDaemon(True)
-auat.start()
+def main():
+    # auto update AccessToken every 7000s
+    auat = AutoUpdateAccessToken()
+    auat.setDaemon(True)
+    auat.start()
 
-# always restart Mmrz at start
-restart_Mmrz()
+    # always restart Mmrz at start
+    restart_Mmrz()
 
-# 创建一个服务器，IP地址为空，端口是8000，处理函数是application:
-port  = 8000
-httpd = make_server('', port, application)
-print "Serving HTTP on port {0}...".format(port)
-# 开始监听HTTP请求:
-httpd.serve_forever()
+    # 创建一个服务器，IP地址为空，端口是8000，处理函数是application:
+    port  = 8000
+    httpd = make_server('', port, application)
+    print "Serving HTTP on port {0}...".format(port)
+    # 开始监听HTTP请求:
+    httpd.serve_forever()
+
+if __name__ == '__main__':
+    main()
+
 
 

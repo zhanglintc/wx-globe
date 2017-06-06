@@ -70,6 +70,9 @@ class updateSend(threading.Thread):
             touser = self.fromuser_name,
         )
 
+def restart_Mmrz():
+    os.system("cd /home/lane/Mmrz-Sync/server && python restart.py &")
+
 def tuling(text):
     url = "http://www.tuling123.com/openapi/api?key=77aa5b955fcab122b096f2c2dd8434c8&info={0}".format(text)
     content = urllib2.urlopen(url)
