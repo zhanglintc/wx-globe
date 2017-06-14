@@ -61,14 +61,34 @@ class updateSend(threading.Thread):
     def run(self):
         time_s = time.time()
         os.system("cd /home/lane/Mmrz-Sync/server && git pull")
+        commit, author, dttime, lginfo = getGitInfo()
         time_e = time.time()
 
         elapse = round(time_e - time_s, 3)
-        sendContent = "Mmrz has updated at:\n{0}\nusing {1}s".format(time.ctime(), elapse)
+        sendContent = "Mmrz has updated at:\n{0}\nusing {1}s\nLog: {2}".format(time.ctime(), elapse, lginfo)
         sendMsg.sendMsg(
             content = sendContent,
             touser = self.fromuser_name,
         )
+
+def getGitInfo():
+    os.system("cd /home/lane/Mmrz-Sync/server && git log -n 1 > mmrz-log.tmp")
+    fr = open("/home/lane/Mmrz-Sync/server/mmrz-log.tmp", "rb")
+    content = fr.read()
+    fr.close()
+    os.system("cd /home/lane/Mmrz-Sync/server && rm mmrz-log.tmp")
+
+    commit = re.search("commit (\w{10})", content)
+    author = re.search("Author: (\w*) \<", content)
+    dttime = re.search("Date: +(.*) +", content)
+    lginfo = re.search("    (.*)", content)
+
+    commit = commit.group(1) if commit else "none"
+    author = author.group(1) if author else "none"
+    dttime = dttime.group(1) if dttime else "none"
+    lginfo = lginfo.group(1) if lginfo else "none"
+
+    return commit, author, dttime, lginfo
 
 def restart_Mmrz():
     os.system("cd /home/lane/Mmrz-Sync/server && python restart.py &")
@@ -263,21 +283,7 @@ def application(environ, start_response):
             event_key = xml_tree.find("EventKey").text
 
             if event_key == "V1001_CURRENT":
-                os.system("cd /home/lane/Mmrz-Sync/server && git log -n 1 > mmrz-log.tmp")
-                fr = open("/home/lane/Mmrz-Sync/server/mmrz-log.tmp", "rb")
-                content = fr.read()
-                fr.close()
-                os.system("cd /home/lane/Mmrz-Sync/server && rm mmrz-log.tmp")
-
-                commit = re.search("commit (\w{10})", content)
-                author = re.search("Author: (\w*) \<", content)
-                dttime = re.search("Date: +(.*) +", content)
-                lginfo = re.search("    (.*)", content)
-
-                commit = commit.group(1) if commit else "none"
-                author = author.group(1) if author else "none"
-                dttime = dttime.group(1) if dttime else "none"
-                lginfo = lginfo.group(1) if lginfo else "none"
+                commit, author, dttime, lginfo = getGitInfo()
 
                 ret_info = "Remote Version Info\nModified at:\n{2}\nAuthor:  {1}\nHash:  {0}\nLog:  {3}".format(commit, author, dttime, lginfo)
 
