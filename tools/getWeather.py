@@ -5,6 +5,9 @@ import urllib
 import json
 import sys, os
 
+sys.path.append('../')
+from MmrzLog import log
+
 Report_T = """\
 城市: {city}
 日期: {date}
@@ -21,6 +24,7 @@ def getWeather(city):
     params = "?key=55f1fdd05fba23be0a18043d0a017&num_of_days=3&format=json&lang=zh&q={0}".format(city)
 
     resp = urllib.urlopen(base_url + params)
+    log.d("resp: " + str(resp))
     dikt = json.loads(resp.read())
 
     date = dikt['data']['weather'][0]['date']

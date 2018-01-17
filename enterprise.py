@@ -281,7 +281,11 @@ def application(environ, start_response):
                 pinyin += item
 
             log.d("pinyin: " + str(pinyin))
-            weather = getWeather(pinyin)
+            try:
+                weather = getWeather(pinyin)
+            except Exception as e:
+                log.d(e)
+                weather = "weather error"
             log.d("weather: " + str(weather))
 
             ret, message = wx.EncryptMsg(text_T.format(weather), d["nonce"][0])

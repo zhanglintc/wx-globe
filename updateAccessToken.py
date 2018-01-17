@@ -21,6 +21,8 @@ def updateAccessToken():
     access_token = ret["access_token"]
 
     # write token to local file
+    import os
+    log.d("current execute path: " + str(os.getcwd()))
     fw = open(tokenFile, "wb")
     fw.write(access_token)
     fw.close()
