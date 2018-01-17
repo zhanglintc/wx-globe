@@ -26,8 +26,8 @@ def sendMsg(content = "", touser = "@all"):
         "msgtype": "text",
         "text": {
             "content": content or "test message"
-            },
-        }
+        },
+    }
     params = json.dumps(params, ensure_ascii = False)
 
     resp = requests.post("https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token={0}".format(access_token), data = params).text
