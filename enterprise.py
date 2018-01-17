@@ -6,6 +6,7 @@ from encrypt.WXBizMsgCrypt import WXBizMsgCrypt
 from pypinyin import pinyin, lazy_pinyin
 from tools.getCommit import getCommit
 from tools.getWeather import getWeather
+from MmrzLog import log
 
 import xml.etree.cElementTree as ET
 
@@ -17,6 +18,14 @@ import json
 import requests
 
 import sendMsg
+
+"""
+App AgentId list:
+AgentId 0: Meta-Controller
+AgentId 3: 天气预报
+AgentId 4: 车位信息共享平台
+AgentId 5: Mmrz-Dock
+"""
 
 # disable warnings
 import warnings
@@ -263,6 +272,7 @@ def application(environ, start_response):
             return message
 
     if agent_ID == "3":
+        log.d("agent_ID 3 entered")
         if msg_type == "text":
             content_text  = xml_tree.find("Content").text
             pinyinList = lazy_pinyin(unicode(content_text))
@@ -270,7 +280,9 @@ def application(environ, start_response):
             for item in pinyinList:
                 pinyin += item
 
+            log.d("pinyin: " + str(pinyin))
             weather = getWeather(pinyin)
+            log.d("weather: " + str(weather))
 
             ret, message = wx.EncryptMsg(text_T.format(weather), d["nonce"][0])
             return message
