@@ -7,9 +7,11 @@ Update AccessToken.
 
 import urllib
 import json
+import sys, os
 from MmrzLog import log
 
-tokenFile = "AccessToken"
+curPath = os.path.abspath(os.path.dirname(sys.argv[0]))
+tokenFile = "{0}/AccessToken".format(curPath)
 
 sAppId = "wx1c77202393c1c41d"
 secret = "3AhT8A1akqYHKVuLCtrcx3OvZPFHbMO03vvBaGu4xyciG8Lj6z1OGs8Zp-81ZtnE"
@@ -22,7 +24,6 @@ def updateAccessToken():
     access_token = ret["access_token"]
 
     # write token to local file
-    import os
     log.d("current execute path: " + str(os.getcwd()))
     fw = open(tokenFile, "wb")
     fw.write(access_token)
@@ -33,9 +34,5 @@ def updateAccessToken():
 if __name__ == '__main__':
     updateAccessToken();
 
-    try:
-        raw_input()
-    except:
-        pass
 
 
