@@ -285,7 +285,7 @@ def application(environ, start_response):
                 weather = getWeather(pinyin)
             except Exception as e:
                 log.d(e)
-                weather = "weather error"
+                weather = "getWeather() exception occured"
             log.d("weather: " + str(weather))
 
             ret, message = wx.EncryptMsg(text_T.format(weather), d["nonce"][0])
