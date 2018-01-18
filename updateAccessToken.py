@@ -7,6 +7,7 @@ Update AccessToken.
 
 import urllib
 import json
+from MmrzLog import log
 
 tokenFile = "AccessToken"
 
