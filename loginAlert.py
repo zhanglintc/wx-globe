@@ -13,7 +13,7 @@ def login_message():
     date = stdout.read().strip()
 
     msg = ""
-    msg += "Login Alert\n"
+    msg += "Login Notification\n"
     msg += "User: {0}\n".format(whoami)
     msg += "Time: {0}\n".format(date)
 
