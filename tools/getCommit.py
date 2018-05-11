@@ -6,9 +6,12 @@ Check https://github.com/zhanglintc and get the day's contributions
 and show it directly.
 """
 
-import os, urllib
+import os, sys, urllib
 import datetime, time
 import re
+
+sys.path.append('../')
+from MmrzLog import log
 
 def getCommit(targetURL):
     today = str(datetime.date.today()) # something like: 2014-11-10
@@ -80,7 +83,12 @@ def getCommit(targetURL):
     return send_content
 
 if __name__ == '__main__':
-    print(getCommit("https://github.com/zhanglintc?tab=contributions&from={0}".format(str(datetime.date.today()))) + "\n")
+    try:
+        print(getCommit("https://github.com/zhanglintc?tab=contributions&from={0}".format(str(datetime.date.today()))) + "\n")
+    except Exception as e:
+        log.e(e)
+        exstr = traceback.format_exc()
+        log.e(exstr)
 
     try:
         raw_input()
