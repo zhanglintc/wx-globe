@@ -8,6 +8,7 @@ and show it directly.
 
 import os, sys, urllib
 import datetime, time
+import traceback
 import re
 
 sys.path.append('../')
@@ -84,7 +85,7 @@ def getCommit(targetURL):
 
 if __name__ == '__main__':
     try:
-        print(getCommit("https://github.com/zhanglintc?tab=contributions&from={0}".format(str(datetime.date.today()))) + "\n")
+        print(getCommit("https://github.com/zhanglintc?tab=contributions&from={0}".format(str(datetime.date.today()))))
     except Exception as e:
         log.e(e)
         exstr = traceback.format_exc()
