@@ -128,7 +128,7 @@ def run_tornado():
     IOLoop.instance().start()
 
 def run_flask():
-    app.run(host=host, port=port)
+    app.run(host=host, port=port, threaded=True)
 
 @app.route('/')
 def index():
