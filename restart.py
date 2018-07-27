@@ -9,6 +9,11 @@ os.system("netstat -ntlp | grep %s | awk '{print $7}' | awk -F/ '{print $1}' | x
 if len(sys.argv) == 2 and sys.argv[1] == "shut":
     sys.exit(0)
 
+if len(sys.argv) == 2 and sys.argv[1] == "wx":
+    print("restarting wx-globe.py")
+    os.system("nohup python wx-globe.py&")
+    sys.exit(0)
+
 print("restarting makeServer.py")
 os.system("nohup python makeServer.py&")
 
