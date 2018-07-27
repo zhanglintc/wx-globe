@@ -150,7 +150,7 @@ def run_flask():
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'GET':
-        query_string = request.args.get('QUERY_STRING')
+        query_string = request.environ.get('QUERY_STRING')
         if query_string:
             return verifyCallbackMode(query_string)
         else:
