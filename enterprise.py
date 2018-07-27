@@ -222,22 +222,24 @@ def verifyCallbackMode(environ):
 def application(environ, start_response):
     # response content
     start_response('200 OK', [('Content-Type', 'text/html')])
-
     if environ["REQUEST_METHOD"] == "GET":
-        if environ["PATH_INFO"] == "/send":
+        if "echostr" in environ['QUERY_STRING']:
+            pass
+        elif environ["PATH_INFO"] == "/send":
             d = parse_qs(environ['QUERY_STRING'])
             text = d.get('text', ["the default message"])[0]
 
             sendMsg.sendMsg(content=text, touser="zhanglintc")
 
             return "/send function entered"
-
-        return "dafault page"
+        else:
+            return "dafault page"
 
     wx = WXBizMsgCrypt(sToken, sEncodingAESKey, sAppId)
     d = parse_qs(environ['QUERY_STRING'])
 
     # set up weixin callback mode
+    print environ['QUERY_STRING']
     if "echostr" in environ['QUERY_STRING']:
         return verifyCallbackMode(environ)
 
