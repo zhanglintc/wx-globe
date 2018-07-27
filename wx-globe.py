@@ -8,6 +8,7 @@ from tornado.ioloop import IOLoop
 
 # Flask
 from flask import Flask
+from flask import request
 app = Flask(__name__)
 
 # WX-Globe
@@ -27,6 +28,14 @@ import json
 import requests
 
 import sendMsg
+
+"""
+App AgentId list:
+AgentId 0: Meta-Controller
+AgentId 3: 天气预报
+AgentId 4: 车位信息共享平台
+AgentId 5: Mmrz-Dock
+"""
 
 # disable warnings
 import warnings
@@ -81,6 +90,14 @@ class updateSend(threading.Thread):
             touser = self.fromuser_name,
         )
 
+def verifyCallbackMode(query_string):
+    d = parse_qs(query_string)
+
+    wx = WXBizMsgCrypt(sToken, sEncodingAESKey, sAppId)
+    ret, sReplyEchoStr = wx.VerifyURL(d["msg_signature"][0], d["timestamp"][0], d["nonce"][0], d["echostr"][0])
+
+    return sReplyEchoStr
+
 def getGitInfo():
     os.system("cd /home/lane/Mmrz-Sync/server && git log -n 1 > mmrz-log.tmp")
     fr = open("/home/lane/Mmrz-Sync/server/mmrz-log.tmp", "rb")
@@ -130,9 +147,130 @@ def run_tornado():
 def run_flask():
     app.run(host=host, port=port, threaded=True)
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def index():
-    return 'Hello World!'
+    if request.method == 'GET':
+        query_string = request.args.get('QUERY_STRING')
+        if query_string:
+            return verifyCallbackMode(query_string)
+        else:
+            return 'the dafault page'
+
+    else: # request.method == 'POST'
+        wx = WXBizMsgCrypt(sToken, sEncodingAESKey, sAppId)
+        d = parse_qs(request.environ.get('QUERY_STRING'))
+        request_body = request.input_stream.read(request.content_length)
+        ret, xml_content = wx.DecryptMsg(request_body, d["msg_signature"][0], d["timestamp"][0], d["nonce"][0])
+        xml_tree = ET.fromstring(xml_content)
+
+        touser_name   = xml_tree.find("ToUserName").text
+        fromuser_name = xml_tree.find("FromUserName").text
+        create_time   = xml_tree.find("CreateTime").text
+        msg_type      = xml_tree.find("MsgType").text
+        agent_ID      = xml_tree.find("AgentID").text
+        # content_text  = xml_tree.find("Content").text
+        # event         = xml_tree.find("Event").text
+        # event_key     = xml_tree.find("EventKey").text
+
+        if agent_ID == "0":
+            if msg_type == "event":
+                event_key = xml_tree.find("EventKey").text
+
+                if event_key == "V1001_GITHUB":
+                    # ret, message = wx.EncryptMsg(text_T.format(getCommit("https://github.com/zhanglintc?period=daily")), d["nonce"][0])
+                    aycs = AsyncSend(fromuser_name)
+                    aycs.start()
+
+                    # return null string
+                    return ""
+
+            else:
+                content_text  = xml_tree.find("Content").text
+                ret, message = wx.EncryptMsg(text_T.format(tuling(content_text)), d["nonce"][0])
+                return message
+
+        if agent_ID == "3":
+            log.d("agent_ID 3 entered")
+            if msg_type == "text":
+                content_text  = xml_tree.find("Content").text
+                pinyinList = lazy_pinyin(unicode(content_text))
+                pinyin = ""
+                for item in pinyinList:
+                    pinyin += item
+
+                log.d("pinyin: " + str(pinyin))
+                try:
+                    weather = getWeather(pinyin)
+                except Exception as e:
+                    log.d(e)
+                    weather = "getWeather() exception occured"
+                log.d("weather: " + str(weather))
+
+                ret, message = wx.EncryptMsg(text_T.format(weather), d["nonce"][0])
+                return message
+
+            ret, message = wx.EncryptMsg(text_T.format("尚不支持..."), d["nonce"][0])
+            return message
+
+        if agent_ID == "5":
+            if msg_type == "event":
+                event_key = xml_tree.find("EventKey").text
+
+                if event_key == "V1001_CURRENT":
+                    commit, author, dttime, lginfo = getGitInfo()
+
+                    ret_info = "Remote Version Info\nModified at:\n{2}\nAuthor:  {1}\nHash:  {0}\nLog:  {3}".format(commit, author, dttime, lginfo)
+
+                    ret, message = wx.EncryptMsg(text_T.format(ret_info), d["nonce"][0])
+
+                    return message
+
+                if event_key == "V1001_PULL_LATEST":
+                    if fromuser_name != "zhanglintc":
+                        ret, message = wx.EncryptMsg(text_T.format("You are not allowed to do this"), d["nonce"][0])
+                        return message
+
+                    ups = updateSend(fromuser_name)
+                    ups.start()
+
+                    ret, message = wx.EncryptMsg(text_T.format("Updating Mmrz, please wait..."), d["nonce"][0])
+                    return message
+
+                if event_key == "V1002_RESTART":
+                    if fromuser_name != "zhanglintc":
+                        ret, message = wx.EncryptMsg(text_T.format("You are not allowed to do this"), d["nonce"][0])
+                        return message
+
+                    restart_Mmrz()
+                    ret, message = wx.EncryptMsg(text_T.format("Server has restart at:\n" + time.ctime()), d["nonce"][0])
+
+                    return message
+
+                if event_key == "V1002_COPY_DB":
+                    os.system("cp /home/yanbin/wx-guike_server/DBDATA/zncx.db /home/lane/ftp")
+
+                    ret, message = wx.EncryptMsg(text_T.format('zncx.db has copied to "ftp://zhanglintc.work"'), d["nonce"][0])
+
+                    return message
+
+            if msg_type == "text":
+                content_text  = xml_tree.find("Content").text
+                ret, message = wx.EncryptMsg(text_T.format(tuling(content_text)), d["nonce"][0])
+
+                return message
+
+            # ret, message = wx.EncryptMsg(text_T.format("尚不支持..."), d["nonce"][0])
+            # return message
+            return ""
+
+        # return a null string
+        return ""
+
+@app.route('/send')
+def send():
+    text = request.args.get('text', "the default message")
+    sendMsg.sendMsg(content=text, touser="zhanglintc")
+    return "/send function entered"
 
 if __name__ == '__main__':
     run_flask() if debug else run_tornado()

@@ -239,7 +239,6 @@ def application(environ, start_response):
     d = parse_qs(environ['QUERY_STRING'])
 
     # set up weixin callback mode
-    print environ['QUERY_STRING']
     if "echostr" in environ['QUERY_STRING']:
         return verifyCallbackMode(environ)
 
