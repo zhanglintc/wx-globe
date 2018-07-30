@@ -17,6 +17,7 @@ from encrypt.WXBizMsgCrypt import WXBizMsgCrypt
 from pypinyin import pinyin, lazy_pinyin
 from tools.getCommit import getCommit
 from tools.getWeather import getWeather
+from MmrzLog import log
 
 import xml.etree.cElementTree as ET
 
