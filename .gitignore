@@ -45,3 +45,5 @@ wx/AccessToken
 /ruby/yesterday.txt
 
 python/yesterday.txt
+
+login-time.json
