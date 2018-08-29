@@ -5,7 +5,7 @@ import sendMsg
 import threading
 import os, json, time
 
-time_log_file = "login-time.json"
+time_log_file = ".login-time.json"
 
 def login_message():
     stdout = os.popen('whoami')
