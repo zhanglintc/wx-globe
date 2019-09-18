@@ -17,7 +17,7 @@ def sendMsg(content = "", touser = "@all"):
 
     except:
         access_token = updateAccessToken()
-   
+
     params = {
         "touser" : touser,
         "toparty": "@all",
@@ -28,7 +28,7 @@ def sendMsg(content = "", touser = "@all"):
             "content": content or "test message"
         },
     }
-    params = json.dumps(params, ensure_ascii = False)
+    params = json.dumps(params, ensure_ascii=True)
 
     resp = requests.post("https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token={0}".format(access_token), data = params).text
     print "from sendMsg: " + resp
