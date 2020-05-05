@@ -15,16 +15,15 @@ class MmrzLog:
     def __init__(self):
         self.abspath = os.path.dirname(os.path.abspath(sys.argv[0]))
         self.log_path = self.abspath + "/Mmrz-Sync.log"
-        self.logger = open(self.log_path, "ab")
+        self.logger = open(self.log_path, "a")
 
     def __del__(self):
         self.logger.close()
 
-    def __new__():
+    def __new__(cls):
         if MmrzLog.log is None:
-            MmrzLog.log = MmrzLog()
-        else:
-            return MmrzLog.log
+            MmrzLog.log = super(cls.__class__, cls).__new__(cls)
+        return MmrzLog.log
 
     def _get_caller_info(self):
         file_name = inspect.currentframe().f_back.f_back.f_code.co_filename

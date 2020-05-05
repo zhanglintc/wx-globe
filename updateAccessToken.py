@@ -5,7 +5,7 @@
 Update AccessToken.
 """
 
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import json
 import sys, os
 from MmrzLog import log
@@ -19,13 +19,13 @@ secret = "3AhT8A1akqYHKVuLCtrcx3OvZPFHbMO03vvBaGu4xyciG8Lj6z1OGs8Zp-81ZtnE"
 def updateAccessToken():
     url = "https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid={0}&corpsecret={1}".format(sAppId, secret)
 
-    web = urllib.urlopen(url)
+    web = urllib.request.urlopen(url)
     ret = json.loads(web.read())
     access_token = ret["access_token"]
 
     # write token to local file
     log.d("current execute path: " + str(os.getcwd()))
-    fw = open(tokenFile, "wb")
+    fw = open(tokenFile, "w")
     fw.write(access_token)
     fw.close()
 

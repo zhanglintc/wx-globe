@@ -1,0 +1,4 @@
+pycrypto
+flask
+tornado
+pypinyin

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import urllib, urllib2
+import urllib.request, urllib.parse, urllib.error, urllib.request, urllib.error, urllib.parse
 import json
 import requests
 
@@ -46,13 +46,13 @@ def XMLParse():
     event = xml_tree.find("Event")
     event_key = xml_tree.find("EventKey")
 
-    print touser_name.text
-    print fromuser_name.text
-    print create_time.text
-    print msg_type.text
-    print agent_ID.text
-    print event.text
-    print event_key.text
+    print(touser_name.text)
+    print(fromuser_name.text)
+    print(create_time.text)
+    print(msg_type.text)
+    print(agent_ID.text)
+    print(event.text)
+    print(event_key.text)
 
 if __name__ == '__main__':
     # post()

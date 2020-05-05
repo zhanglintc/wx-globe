@@ -17,9 +17,10 @@ from Crypto.Cipher import AES
 import xml.etree.cElementTree as ET
 import sys
 import socket
-reload(sys)
-import ierror
-sys.setdefaultencoding('utf-8')
+import importlib
+importlib.reload(sys)
+from . import ierror
+# sys.setdefaultencoding('utf-8')
 
 """
 关于Crypto.Cipher模块，ImportError: No module named 'Crypto'解决方案
@@ -50,7 +51,7 @@ class SHA1:
             sha = hashlib.sha1()
             sha.update("".join(sortlist))
             return  ierror.WXBizMsgCrypt_OK, sha.hexdigest()
-        except Exception,e:
+        except Exception as e:
             #print e
             return  ierror.WXBizMsgCrypt_ComputeSignature_Error, None
 
@@ -76,7 +77,7 @@ class XMLParse:
             encrypt  = xml_tree.find("Encrypt")
             touser_name    = xml_tree.find("ToUserName")
             return  ierror.WXBizMsgCrypt_OK, encrypt.text, touser_name.text
-        except Exception,e:
+        except Exception as e:
             #print e
             return  ierror.WXBizMsgCrypt_ParseXml_Error,None,None
 
@@ -153,7 +154,7 @@ class Prpcrypt(object):
             ciphertext = cryptor.encrypt(text)
             # 使用BASE64对加密后的字符串进行编码
             return ierror.WXBizMsgCrypt_OK, base64.b64encode(ciphertext)
-        except Exception,e:
+        except Exception as e:
             #print e
             return  ierror.WXBizMsgCrypt_EncryptAES_Error,None
 
@@ -166,7 +167,7 @@ class Prpcrypt(object):
             cryptor = AES.new(self.key,self.mode,self.key[:16])
             # 使用BASE64对密文进行解码，然后AES-CBC解密
             plain_text  = cryptor.decrypt(base64.b64decode(text))
-        except Exception,e:
+        except Exception as e:
             #print e
             return  ierror.WXBizMsgCrypt_DecryptAES_Error,None
         try:
@@ -179,7 +180,7 @@ class Prpcrypt(object):
             xml_len = socket.ntohl(struct.unpack("I",content[ : 4])[0])
             xml_content = content[4 : xml_len+4]
             from_appid = content[xml_len+4:]
-        except Exception,e:
+        except Exception as e:
             #print e
             return  ierror.WXBizMsgCrypt_IllegalBuffer,None
         if  from_appid != appid:
@@ -256,9 +257,9 @@ class WXBizMsgCrypt(object):
     def VerifyURL(self, sMsgSignature, sTimeStamp, sNonce, sEchoStr):
         sha1 = SHA1()
         ret, signature = sha1.getSHA1(self.token, sTimeStamp, sNonce, sEchoStr)
-        print "token: ", self.token
-        print "signature: ", signature
-        print "sMsgSignature: ", sMsgSignature
+        print("token: ", self.token)
+        print("signature: ", signature)
+        print("sMsgSignature: ", sMsgSignature)
         if ret != 0:
             return ret, None
         if not signature == sMsgSignature:

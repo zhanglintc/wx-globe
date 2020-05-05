@@ -6,7 +6,7 @@ Check https://github.com/zhanglintc and get the day's contributions
 and show it directly.
 """
 
-import os, sys, urllib
+import os, sys, urllib.request, urllib.parse, urllib.error
 import datetime, time
 import traceback
 import re
@@ -19,8 +19,8 @@ def getCommit(targetURL):
     cur_time = (datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')) # 2014-11-10 15:12:40
     log_file = (datetime.datetime.fromtimestamp(time.time()).strftime('%Y%m%d_%H%M%S')) + '.log' # 20141110_151240.log
 
-    web_cotent = urllib.urlopen(targetURL) # open website
-    web_cotent = urllib.urlopen(targetURL) # do it twice
+    web_cotent = urllib.request.urlopen(targetURL) # open website
+    web_cotent = urllib.request.urlopen(targetURL) # do it twice
 
     line  = True
     error = True
@@ -85,14 +85,14 @@ def getCommit(targetURL):
 
 if __name__ == '__main__':
     try:
-        print(getCommit("https://github.com/zhanglintc?tab=contributions&from={0}".format(str(datetime.date.today()))))
+        print((getCommit("https://github.com/zhanglintc?tab=contributions&from={0}".format(str(datetime.date.today())))))
     except Exception as e:
         log.e(e)
         exstr = traceback.format_exc()
         log.e(exstr)
 
     try:
-        raw_input()
+        input()
     except:
         pass
 

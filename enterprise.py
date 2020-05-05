@@ -11,7 +11,7 @@ from MmrzLog import log
 import xml.etree.cElementTree as ET
 
 import os, re, time
-import urllib, urllib2
+import urllib.request, urllib.parse, urllib.error, urllib.request, urllib.error, urllib.parse
 import threading
 import datetime
 import json
@@ -104,15 +104,15 @@ def restart_Mmrz():
 
 def tuling(text):
     url = "http://www.tuling123.com/openapi/api?key=77aa5b955fcab122b096f2c2dd8434c8&info={0}".format(text)
-    content = urllib2.urlopen(url)
+    content = urllib.request.urlopen(url)
     content = json.loads(content.read())
 
     return content["text"]
 
 def simsimi(text):
-    text = urllib.quote(text.encode("utf-8"))
+    text = urllib.parse.quote(text.encode("utf-8"))
     url = "http://simsimi.com/getRealtimeReq?uuid=lsUq8qBErrxTthxXH5rqbcnMLEyvkPu9uI3dDsC9lW9&lc=ch&ft=1&reqText={0}".format(text)
-    content = urllib2.urlopen(url)
+    content = urllib.request.urlopen(url)
     content = json.loads(content.read())
 
     return content.get("respSentence", "尚不支持...").encode("utf-8")
@@ -122,10 +122,10 @@ def setMenu():
     url = "https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid={0}&corpsecret={1}".format(sAppId, secret)
     access_token = ""
     if not access_token:
-        web = urllib.urlopen(url)
+        web = urllib.request.urlopen(url)
         ret = json.loads(web.read())
         access_token = ret["access_token"]
-        print access_token
+        print(access_token)
 
     params = {
         "button":[
@@ -158,9 +158,9 @@ def setMenu():
         ]
     }
     params = json.dumps(params, ensure_ascii = False)
-    print params
+    print(params)
 
-    print requests.post("https://qyapi.weixin.qq.com/cgi-bin/menu/create?access_token={0}&agentid=0".format(access_token), data = params).text
+    print(requests.post("https://qyapi.weixin.qq.com/cgi-bin/menu/create?access_token={0}&agentid=0".format(access_token), data = params).text)
 
     Mmrz_Menu = {
         "button":[
@@ -194,7 +194,7 @@ def setMenu():
         ]
     }
     Mmrz_Menu = json.dumps(Mmrz_Menu, ensure_ascii = False)
-    print requests.post("https://qyapi.weixin.qq.com/cgi-bin/menu/create?access_token={0}&agentid=5".format(access_token), data = Mmrz_Menu).text
+    print(requests.post("https://qyapi.weixin.qq.com/cgi-bin/menu/create?access_token={0}&agentid=5".format(access_token), data = Mmrz_Menu).text)
 
 def getRequestBody(environ):
     # the environment variable CONTENT_LENGTH may be empty or missing
@@ -276,7 +276,7 @@ def application(environ, start_response):
         log.d("agent_ID 3 entered")
         if msg_type == "text":
             content_text  = xml_tree.find("Content").text
-            pinyinList = lazy_pinyin(unicode(content_text))
+            pinyinList = lazy_pinyin(str(content_text))
             pinyin = ""
             for item in pinyinList:
                 pinyin += item

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import json
 import sys, os
 
@@ -23,7 +23,7 @@ def getWeather(city):
     base_url = "http://api.worldweatheronline.com/free/v2/weather.ashx"
     params = "?key=55f1fdd05fba23be0a18043d0a017&num_of_days=3&format=json&lang=zh&q={0}".format(city)
 
-    resp = urllib.urlopen(base_url + params)
+    resp = urllib.request.urlopen(base_url + params)
     log.d("resp: " + str(resp))
     dikt = json.loads(resp.read())
 

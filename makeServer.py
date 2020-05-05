@@ -34,7 +34,7 @@ def main():
     # 创建一个服务器，IP地址为空，端口是8000，处理函数是application:
     port  = 8000
     httpd = make_server('', port, application)
-    print "Serving HTTP on port {0}...".format(port)
+    print("Serving HTTP on port {0}...".format(port))
     # 开始监听HTTP请求:
     httpd.serve_forever()
 
