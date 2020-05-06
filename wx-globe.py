@@ -101,7 +101,7 @@ def verifyCallbackMode(query_string):
 
 def getGitInfo():
     os.system("cd /home/lane/Mmrz-Sync/server && git log -n 1 > mmrz-log.tmp")
-    fr = open("/home/lane/Mmrz-Sync/server/mmrz-log.tmp", "rb")
+    fr = open("/home/lane/Mmrz-Sync/server/mmrz-log.tmp", "r")
     content = fr.read()
     fr.close()
     os.system("cd /home/lane/Mmrz-Sync/server && rm mmrz-log.tmp")
