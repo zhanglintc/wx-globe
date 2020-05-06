@@ -15,12 +15,12 @@ import time
 import struct
 from Crypto.Cipher import AES
 import xml.etree.cElementTree as ET
-import sys
 import socket
-import importlib
-importlib.reload(sys)
+import logging
 from . import ierror
-# sys.setdefaultencoding('utf-8')
+
+
+logger = logging.Logger(__name__)
 
 """
 关于Crypto.Cipher模块，ImportError: No module named 'Crypto'解决方案
@@ -33,6 +33,12 @@ class FormatException(Exception):
 def throw_exception(message, exception_class=FormatException):
     """my define raise exception function"""
     raise exception_class(message)
+
+def to_utf8_bytes(str):
+    return str.encode("utf8")
+
+def utf8_bytes_to_str(bytes):
+    return bytes.decode("utf8")
 
 class SHA1:
     """计算公众平台的消息签名接口"""
@@ -49,10 +55,10 @@ class SHA1:
             sortlist = [token, timestamp, nonce, encrypt]
             sortlist.sort()
             sha = hashlib.sha1()
-            sha.update("".join(sortlist))
+            sha.update(to_utf8_bytes("".join(sortlist)))
             return  ierror.WXBizMsgCrypt_OK, sha.hexdigest()
         except Exception as e:
-            #print e
+            logger.exception('wechat encryption/decryption error')
             return  ierror.WXBizMsgCrypt_ComputeSignature_Error, None
 
 
@@ -78,7 +84,7 @@ class XMLParse:
             touser_name    = xml_tree.find("ToUserName")
             return  ierror.WXBizMsgCrypt_OK, encrypt.text, touser_name.text
         except Exception as e:
-            #print e
+            logger.exception('wechat encryption/decryption error')
             return  ierror.WXBizMsgCrypt_ParseXml_Error,None,None
 
     def generate(self, encrypt, signature, timestamp, nonce):
@@ -103,19 +109,19 @@ class PKCS7Encoder():
     """提供基于PKCS7算法的加解密接口"""
 
     block_size = 32
-    def encode(self, text):
+    def encode(self, text_bytes):
         """ 对需要加密的明文进行填充补位
-        @param text: 需要进行填充补位操作的明文
-        @return: 补齐明文字符串
+        @param text_bytes: 需要进行填充补位操作的明文(bytes)
+        @return: 补齐明文字符(bytes)
         """
-        text_length = len(text)
+        text_length = len(text_bytes)
         # 计算需要填充的位数
         amount_to_pad = self.block_size - (text_length % self.block_size)
         if amount_to_pad == 0:
             amount_to_pad = self.block_size
         # 获得补位所用的字符
-        pad = chr(amount_to_pad)
-        return text + pad * amount_to_pad
+        pad = bytearray([amount_to_pad])
+        return text_bytes + pad * amount_to_pad
 
     def decode(self, decrypted):
         """删除解密后明文的补位字符
@@ -144,18 +150,20 @@ class Prpcrypt(object):
         @return: 加密得到的字符串
         """
         # 16位随机字符串添加到明文开头
-        text = self.get_random_str() + struct.pack("I",socket.htonl(len(text))) + text + appid
+        text_bytes = to_utf8_bytes(text)
+        text_bytes = to_utf8_bytes(self.get_random_str()) + struct.pack("I", socket.htonl(
+            len(text_bytes))) + text_bytes + to_utf8_bytes(appid)
         # 使用自定义的填充方式对明文进行补位填充
         pkcs7 = PKCS7Encoder()
-        text = pkcs7.encode(text)
+        text_bytes = pkcs7.encode(text_bytes)
         # 加密
         cryptor = AES.new(self.key,self.mode,self.key[:16])
         try:
-            ciphertext = cryptor.encrypt(text)
+            ciphertext = cryptor.encrypt(text_bytes)
             # 使用BASE64对加密后的字符串进行编码
-            return ierror.WXBizMsgCrypt_OK, base64.b64encode(ciphertext)
+            return ierror.WXBizMsgCrypt_OK, utf8_bytes_to_str(base64.b64encode(ciphertext))
         except Exception as e:
-            #print e
+            logger.exception('wechat encryption/decryption error')
             return  ierror.WXBizMsgCrypt_EncryptAES_Error,None
 
     def decrypt(self,text,appid):
@@ -168,10 +176,10 @@ class Prpcrypt(object):
             # 使用BASE64对密文进行解码，然后AES-CBC解密
             plain_text  = cryptor.decrypt(base64.b64decode(text))
         except Exception as e:
-            #print e
+            logger.exception('wechat encryption/decryption error')
             return  ierror.WXBizMsgCrypt_DecryptAES_Error,None
         try:
-            pad = ord(plain_text[-1])
+            pad = plain_text[-1]
             # 去掉补位字符串
             #pkcs7 = PKCS7Encoder()
             #plain_text = pkcs7.encode(plain_text)
@@ -179,9 +187,9 @@ class Prpcrypt(object):
             content = plain_text[16:-pad]
             xml_len = socket.ntohl(struct.unpack("I",content[ : 4])[0])
             xml_content = content[4 : xml_len+4]
-            from_appid = content[xml_len+4:]
+            from_appid = utf8_bytes_to_str(content[xml_len+4:])
         except Exception as e:
-            #print e
+            logger.exception('wechat encryption/decryption error')
             return  ierror.WXBizMsgCrypt_IllegalBuffer,None
         if  from_appid != appid:
             return ierror.WXBizMsgCrypt_ValidateAppid_Error,None
@@ -191,9 +199,11 @@ class Prpcrypt(object):
         """ 随机生成16位字符串
         @return: 16位字符串
         """
-        rule = string.letters + string.digits
+        rule = string.ascii_letters + string.digits
         str = random.sample(rule, 16)
         return "".join(str)
+
+
 
 class WXBizMsgCrypt(object):
     #构造函数
@@ -253,18 +263,4 @@ class WXBizMsgCrypt(object):
         pc = Prpcrypt(self.key)
         ret,xml_content = pc.decrypt(encrypt,self.appid)
         return ret,xml_content
-
-    def VerifyURL(self, sMsgSignature, sTimeStamp, sNonce, sEchoStr):
-        sha1 = SHA1()
-        ret, signature = sha1.getSHA1(self.token, sTimeStamp, sNonce, sEchoStr)
-        print("token: ", self.token)
-        print("signature: ", signature)
-        print("sMsgSignature: ", sMsgSignature)
-        if ret != 0:
-            return ret, None
-        if not signature == sMsgSignature:
-            return WXBizMsgCrypt_ValidateSignature_Error, None
-        pc = Prpcrypt(self.key)
-        ret, sReplyEchoStr = pc.decrypt(sEchoStr, self.appid)
-        return ret, sReplyEchoStr
 
